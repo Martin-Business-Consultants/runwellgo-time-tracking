@@ -392,7 +392,7 @@ func create(ctx context.Context, api *plugin.API, req *plugin.Request) (*plugin.
 	e.WorkedOn = today(ctx, api).Format(time.DateOnly)
 	if w := strings.TrimSpace(body.Entry.WorkedOn); w != "" {
 		if _, err := time.Parse(time.DateOnly, w); err != nil {
-			return plugin.Invalid(map[string][]string{"worked_on": {"is not a date"}}), nil
+			return plugin.Invalid(map[string][]string{"worked_on": {"is not a date"}}), nil //nolint:nilerr // the caller's mistake, answered
 		}
 		e.WorkedOn = w
 	}
@@ -435,7 +435,7 @@ func destroy(ctx context.Context, api *plugin.API, req *plugin.Request) (*plugin
 	}
 	var e Entry
 	if !ok || json.Unmarshal([]byte(raw), &e) != nil || e.UserID != req.Actor.ID {
-		return plugin.JSON(http.StatusNotFound, map[string]any{"error": "not_found", "message": "Couldn't find that time of yours."}), nil
+		return plugin.JSON(http.StatusNotFound, map[string]any{"error": "not_found", "message": "Couldn't find that time of yours."}), nil //nolint:nilerr // unreadable is not found
 	}
 	if err := api.KVDelete(ctx, entryKey(n)); err != nil {
 		return nil, err
