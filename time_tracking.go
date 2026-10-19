@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Martin-Business-Consultants/runwellgo/internal/plugin"
+	"github.com/Martin-Business-Consultants/runwellgo/v3/plugin"
 )
 
 // Key is the plugin's key.

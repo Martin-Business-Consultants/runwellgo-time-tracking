@@ -1,0 +1,118 @@
+# golangci-lint v2: what `make lint` and CI's lint job check. Correctness,
+# security and resource leaks first; style only where it's cheap to keep.
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+linters:
+  default: none
+  enable:
+    # correctness
+    - govet
+    - staticcheck
+    - unused
+    - errcheck
+    - errorlint
+    - nilerr
+    - ineffassign
+    - copyloopvar
+    - durationcheck
+    - reassign
+    - forcetypeassert
+    # security and resources
+    - gosec
+    - bidichk
+    - asciicheck
+    - bodyclose
+    - noctx
+    - sqlclosecheck
+    - rowserrcheck
+    - fatcontext
+    - containedctx
+    # style and modernization
+    - gocritic
+    - revive
+    - misspell
+    - dupword
+    - predeclared
+    - errname
+    - unconvert
+    - usestdlibvars
+    - usetesting
+    - thelper
+    - intrange
+    - modernize
+    - perfsprint
+    - nolintlint
+    # complexity, at thresholds a CMS's handlers can meet
+    - gocyclo
+    - nestif
+
+  settings:
+    errcheck:
+      check-type-assertions: true
+      exclude-functions:
+        - (net/http.ResponseWriter).Write # the client went away; nothing to do
+    perfsprint:
+      errorf: false # fmt.Errorf without verbs reads fine
+    gocyclo:
+      min-complexity: 30
+    nestif:
+      min-complexity: 8
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment # struct layout churn for no measurable gain here
+        - shadow # `err` shadowing is idiomatic
+    gosec:
+      excludes:
+        - G104 # unhandled errors: errcheck covers it
+    revive:
+      rules:
+        - name: exported # every exported name says what it is
+        - name: package-comments
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+
+  exclusions:
+    generated: lax
+    presets:
+      - std-error-handling
+    paths:
+      - ^agent/
+      - ^\.agents/
+      - ^\.claude/
+      - ^ui/
+      - ^data/
+    rules:
+      - path: _test\.go
+        linters:
+          - gosec
+          - errcheck
+          - forcetypeassert
+          - gocyclo
+          - nestif
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/Martin-Business-Consultants/runwellgo
+  exclusions:
+    generated: lax
+    paths:
+      - ^agent/
+      - ^\.agents/
+      - ^\.claude/
+      - ^ui/
+      - ^data/
